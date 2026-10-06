@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>Swivel.Tests</RootNamespace>
+    <AssemblyName>swivel.tests</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\swivel\Core\*.cs" />
+    <Compile Include="..\swivel\Ui\*.cs" />
+    <Compile Include="..\swivel\Ui\Screens\*.cs" />
+    <Compile Include="Checks.cs" />
+  </ItemGroup>
+
+</Project>
