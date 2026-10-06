@@ -14,7 +14,7 @@ from ..utils.keys import poll, edit
 from ..core.sim import Sim
 from ..core.server import start as server_start, stop as server_stop
 
-TABS = ("SETUP", "LIVE", "STATS", "FP", "REPLAY", "SESSIONS", "PAYLOAD", "ALERTS", "SETTINGS", "ABOUT")
+TABS = ("SETUP", "LIVE", "STATS", "FP", "REPLAY", "SESSIONS", "PAYLOAD", "NETWORK", "ALERTS", "SETTINGS", "ABOUT")
 MAX_COL = 100
 GAP = 2
 
@@ -118,7 +118,7 @@ def handle(app, ch):
         app.tab, app.sel = (app.tab + 1) % len(TABS), 0
     elif ch == "[":
         app.tab, app.sel = (app.tab - 1) % len(TABS), 0
-    elif ch in "123456789":
+    elif ch in "1234567890":
         app.tab, app.sel = int(ch) - 1, 0
     elif ch == "r":
         app.sim = Sim()
@@ -126,7 +126,7 @@ def handle(app, ch):
         from ..core.server import LOCK, HITS
         with LOCK:
             HITS.clear()
-    elif ch == "s" and app.tab == 7:  # ALERTS tab - save
+    elif ch == "s" and app.tab == 8:  # ALERTS tab - save
         from ..core.alerts import clear_alerts
         clear_alerts()
     else:
@@ -181,14 +181,16 @@ def _screen_keys(app, ch):
                 sess_mod.delete_session(saved[app.sel]["path"])
     elif app.tab == 6:  # PAYLOAD (no special keys)
         pass
-    elif app.tab == 7:  # ALERTS
+    elif app.tab == 7:  # NETWORK (no special keys)
+        pass
+    elif app.tab == 8:  # ALERTS
         if ch == "c":
             from ..core.alerts import clear_alerts
             clear_alerts()
         elif ch == "e":
             from ..core import export
             export.export_session()
-    elif app.tab == 8:  # SETTINGS
+    elif app.tab == 9:  # SETTINGS
         n = len(app.options)
         if ch == "w":
             app.sel = (app.sel - 1) % n
