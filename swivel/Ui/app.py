@@ -108,7 +108,7 @@ def handle(app, ch):
         app.tab, app.sel = (app.tab + 1) % len(TABS), 0
     elif ch == "[":
         app.tab, app.sel = (app.tab - 1) % len(TABS), 0
-    elif ch in "123456":
+    elif ch in "1234567":
         app.tab, app.sel = int(ch) - 1, 0
     elif ch == "r":
         app.sim = Sim()
@@ -116,6 +116,9 @@ def handle(app, ch):
         from ..core.server import LOCK, HITS
         with LOCK:
             HITS.clear()
+    elif ch == "s" and app.tab == 5:  # ALERTS tab - save
+        from ..core.alerts import clear_alerts
+        clear_alerts()
     else:
         _screen_keys(app, ch)
     return True
@@ -132,7 +135,25 @@ def _screen_keys(app, ch):
                 server_start(*app.form.values)
             else:
                 app.form.editing = True
-    elif app.tab == 4:
+    elif app.tab == 4:  # REPLAY
+        if ch == "s":
+            from ..core import sessions, server
+            with server.LOCK:
+                hits = list(server.HITS)
+            sessions.save_session(hits)
+        elif ch == "r":
+            from ..core import sessions, server
+            with server.LOCK:
+                hits = list(server.HITS)
+            sessions.save_session(hits)
+    elif app.tab == 5:  # ALERTS
+        if ch == "c":
+            from ..core.alerts import clear_alerts
+            clear_alerts()
+        elif ch == "e":
+            from ..core import export
+            export.export_session()
+    elif app.tab == 6:  # SETTINGS
         n = len(app.options)
         if ch == "w":
             app.sel = (app.sel - 1) % n
@@ -144,6 +165,13 @@ def _screen_keys(app, ch):
             app.adjust(1)
         elif ch in ("\r", "\n", " "):
             app.adjust(1)
+        elif ch == "s":
+            from ..core import config
+            cfg = {o["name"].lower(): o["value"] if o["type"] != "choice" else o["options"][o["value"]] for o in app.options}
+            cfg["theme"] = app.get("Theme")
+            cfg["webhook"] = app.form.values[0] if len(app.form.values) > 0 else ""
+            cfg["target"] = app.form.values[1] if len(app.form.values) > 1 else ""
+            config.save(cfg)
 
 
 def render(app, ctx):
