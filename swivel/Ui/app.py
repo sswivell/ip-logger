@@ -181,7 +181,8 @@ def loop(app):
 
 def main(argv=None):
     """Entry point: bootstrap dependencies, then run the interface."""
-    from ..core import geo, tunnel
+    from ..core import geo
+    from ..utils import tunnel
     from ..utils.bootstrap import ensure_pip
 
     args = list(sys.argv[1:] if argv is None else argv)

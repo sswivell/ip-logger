@@ -7,7 +7,8 @@ import urllib.request
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from .. import geo, payload, tunnel
+from . import geo, payload
+from ..utils import tunnel
 
 TARGET = ["http://localhost:8080/"]
 PORT = [5000]
