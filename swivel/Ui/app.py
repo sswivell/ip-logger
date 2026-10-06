@@ -5,6 +5,7 @@ import sys
 import time
 
 from . import theme, widgets as W
+from .theme import fg
 from .screens import SCREENS
 from .splash import splash
 from ..utils.bootstrap import (HT, check_tty, enable_ansi, enter_alt_screen,
