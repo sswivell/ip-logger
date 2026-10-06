@@ -14,7 +14,7 @@ from ..utils.keys import poll, edit
 from ..core.sim import Sim
 from ..core.server import start as server_start, stop as server_stop
 
-TABS = ("SETUP", "LIVE", "STATS", "FP", "REPLAY", "ALERTS", "SETTINGS", "ABOUT")
+TABS = ("SETUP", "LIVE", "STATS", "FP", "REPLAY", "SESSIONS", "ALERTS", "SETTINGS", "ABOUT")
 MAX_COL = 100
 GAP = 2
 
@@ -118,7 +118,7 @@ def handle(app, ch):
         app.tab, app.sel = (app.tab + 1) % len(TABS), 0
     elif ch == "[":
         app.tab, app.sel = (app.tab - 1) % len(TABS), 0
-    elif ch in "1234567":
+    elif ch in "12345678":
         app.tab, app.sel = int(ch) - 1, 0
     elif ch == "r":
         app.sim = Sim()
@@ -126,7 +126,7 @@ def handle(app, ch):
         from ..core.server import LOCK, HITS
         with LOCK:
             HITS.clear()
-    elif ch == "s" and app.tab == 5:  # ALERTS tab - save
+    elif ch == "s" and app.tab == 6:  # ALERTS tab - save
         from ..core.alerts import clear_alerts
         clear_alerts()
     else:
@@ -156,14 +156,37 @@ def _screen_keys(app, ch):
             with server.LOCK:
                 hits = list(server.HITS)
             sessions.save_session(hits)
-    elif app.tab == 5:  # ALERTS
+    elif app.tab == 5:  # SESSIONS
+        if ch == "w":
+            app.sel = max(0, app.sel - 1)
+        elif ch == "s":
+            from ..core import sessions as sess_mod
+            saved = sess_mod.list_sessions()
+            app.sel = min(len(saved) - 1, app.sel + 1) if saved else 0
+        elif ch in ("\r", "\n", " "):
+            from ..core import sessions as sess_mod
+            saved = sess_mod.list_sessions()
+            if saved and app.sel < len(saved):
+                data = sess_mod.load_session(saved[app.sel]["path"])
+                if data:
+                    # Load session into current hits
+                    from ..core import server
+                    with server.LOCK:
+                        server.HITS.clear()
+                        server.HITS.extend(data.get("hits", []))
+        elif ch == "d":
+            from ..core import sessions as sess_mod
+            saved = sess_mod.list_sessions()
+            if saved and app.sel < len(saved):
+                sess_mod.delete_session(saved[app.sel]["path"])
+    elif app.tab == 6:  # ALERTS
         if ch == "c":
             from ..core.alerts import clear_alerts
             clear_alerts()
         elif ch == "e":
             from ..core import export
             export.export_session()
-    elif app.tab == 6:  # SETTINGS
+    elif app.tab == 7:  # SETTINGS
         n = len(app.options)
         if ch == "w":
             app.sel = (app.sel - 1) % n
