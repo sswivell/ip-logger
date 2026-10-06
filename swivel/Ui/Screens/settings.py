@@ -9,6 +9,19 @@ def heading(ctx, text):
     return [ctx.m + gradient(text, T.BRAND, (ctx.nw * .15) % 1.0), ""]
 
 
+def theme_preview(ctx, name):
+    """Show a preview of a theme's colors."""
+    theme_data = T.THEMES.get(name)
+    if not theme_data:
+        return []
+    
+    rows = [fg(*T.VI) + B + f" {name} PREVIEW " + R]
+    for i, color in enumerate(theme_data):
+        block = fg(*color) + "████" + R + " " + fg(*T.GREY) + str(color) + R
+        rows.append(ctx.m + "  " + block)
+    return rows
+
+
 def settings(app, ctx):
     """Theme, animation and rendering options."""
     out = heading(ctx, " SETTINGS ")
@@ -28,6 +41,15 @@ def settings(app, ctx):
         name = W.label(opt["name"], focused)
         line = lr(" %s %s" % (W.marker(focused), name), value, ctx.w)
         rows.append(W.highlight(line, ctx.w, T.VI) if focused else line)
+    
+    # Theme previews
+    rows += ["", fg(*T.VI) + B + " THEME PREVIEWS " + R, ""]
+    for tname in T.THEMES:
+        is_current = tname == app.get("Theme")
+        prefix = fg(*T.GN) + "► " + R if is_current else "  "
+        rows.append(ctx.m + prefix + fg(*T.WHITE if is_current else T.GREY) + tname + R)
+        rows.extend(theme_preview(ctx, tname))
+        rows.append("")
     
     # Persisted settings
     rows += ["", fg(*T.VI) + B + " PERSISTED " + R, ""]
