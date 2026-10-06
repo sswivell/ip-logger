@@ -14,7 +14,7 @@ from ..utils.keys import poll, edit
 from ..core.sim import Sim
 from ..core.server import start as server_start, stop as server_stop
 
-TABS = ("SETUP", "LIVE", "STATS", "FP", "SETTINGS", "ABOUT")
+TABS = ("SETUP", "LIVE", "STATS", "FP", "REPLAY", "SETTINGS", "ABOUT")
 MAX_COL = 100
 GAP = 2
 
