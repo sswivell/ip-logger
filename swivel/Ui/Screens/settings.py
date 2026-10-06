@@ -2,6 +2,7 @@
 
 from ...ui import theme as T, widgets as W
 from ...ui.theme import B, R, fg, gradient, lr
+from ...core import config
 
 
 def heading(ctx, text):
@@ -27,5 +28,13 @@ def settings(app, ctx):
         name = W.label(opt["name"], focused)
         line = lr(" %s %s" % (W.marker(focused), name), value, ctx.w)
         rows.append(W.highlight(line, ctx.w, T.VI) if focused else line)
-    rows += ["", fg(*T.GREY) + "w/s move   a/d adjust   enter toggle" + R]
+    
+    # Persisted settings
+    rows += ["", fg(*T.VI) + B + " PERSISTED " + R, ""]
+    cfg = config.load()
+    rows.append(ctx.m + fg(*T.GREY) + f"  theme: {cfg.get('theme')}" + R)
+    rows.append(ctx.m + fg(*T.GREY) + f"  webhook: {cfg.get('webhook')[:40] if cfg.get('webhook') else 'none'}" + R)
+    rows.append(ctx.m + fg(*T.GREY) + f"  target: {cfg.get('target')[:40] if cfg.get('target') else 'none'}" + R)
+    
+    rows += ["", fg(*T.GREY) + "w/s move   a/d adjust   enter toggle   s save" + R]
     return out + [ctx.m + x for x in W.panel("SETTINGS", rows, ctx.w, T.VI)]
