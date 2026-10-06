@@ -10,7 +10,7 @@ from .screens import SCREENS
 from .splash import splash
 from ..utils.bootstrap import (HT, check_tty, enable_ansi, enter_alt_screen,
                                 leave_alt_screen, raw_terminal)
-from ..utils.keys import poll
+from ..utils.keys import poll, edit
 from ..core.sim import Sim
 from ..core.server import start as server_start, stop as server_stop
 
@@ -97,7 +97,7 @@ def handle(app, ch):
         if ch == "\x1b" or ch in ("\r", "\n"):
             app.form.editing = False
         else:
-            app.form.values[app.form.sel] = poll.edit(
+            app.form.values[app.form.sel] = edit(
                 ch, app.form.values[app.form.sel])
         return True
     if ch in ("q", "\x03"):
