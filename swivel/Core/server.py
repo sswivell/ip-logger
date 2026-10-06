@@ -7,7 +7,7 @@ import urllib.request
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from . import geo, payload
+from . import geo, payload, alerts
 from ..utils import tunnel
 
 TARGET = ["http://localhost:8080/"]
@@ -80,13 +80,14 @@ def record(ip, path, ua, referer, args, extra=None):
     tag_text = " ".join(tags) if tags else "OK"
 
     with LOCK:
-        HITS.append({
+        hit = {
             "ip": ip, "loc": loc, "flag": geo.flag(info["cc"]),
             "cc": info["cc"], "isp": info["isp"], "as": info["as"],
             "ua": ua, "os": os_name, "br": browser, "ref": referer,
             "path": path, "ts": stamp, "risk": score, "tags": tag_text,
             "ab": ab, "bad": is_scan, "sig": signature, "fp": fp,
-        })
+        }
+        HITS.append(hit)
         del HITS[:-200]
         STATS["tot"] += 1
         if ab:
@@ -102,6 +103,7 @@ def record(ip, path, ua, referer, args, extra=None):
         CC[info["cc"]] = CC.get(info["cc"], 0) + 1
         ISP[info["isp"][:20]] = ISP.get(info["isp"][:20], 0) + 1
 
+    alerts.check_alert(hit)
     notify(ip, info, tags, score, ab, ua, os_name, browser, fp, stamp)
     return score
 
