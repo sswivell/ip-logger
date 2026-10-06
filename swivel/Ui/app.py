@@ -32,19 +32,29 @@ class App:
     """Everything the renderer needs: options, selection, traffic series."""
 
     def __init__(self, form=None):
+        from ..core import config
+        cfg = config.load()
+        
+        # Find theme index
+        theme_idx = 0
+        for i, t in enumerate(list(theme.THEMES)):
+            if t == cfg.get("theme", "SWIVEL"):
+                theme_idx = i
+                break
+        
         self.sim = Sim()
         self.tab = 0
         self.sel = 0
         self.form = form or Form()
         self.options = [
             {"name": "Theme", "type": "choice",
-             "options": list(theme.THEMES), "value": 0},
+             "options": list(theme.THEMES), "value": theme_idx},
             {"name": "Animations", "type": "bool", "value": True},
             {"name": "Sparklines", "type": "bool", "value": True},
             {"name": "Compact", "type": "bool", "value": True},
-            {"name": "Brightness", "type": "int", "value": 100,
+            {"name": "Brightness", "type": "int", "value": cfg.get("brightness", 100),
              "min": 30, "max": 150, "step": 5},
-            {"name": "Refresh Hz", "type": "int", "value": 20,
+            {"name": "Refresh Hz", "type": "int", "value": cfg.get("refresh_hz", 20),
              "min": 5, "max": 60, "step": 5},
         ]
         self.apply()
